@@ -1,8 +1,6 @@
-// src/hooks/useWebSocket.js
 
 import { useState, useEffect, useRef } from 'react';
-
-const WS_URL = 'ws://localhost:3000'; 
+import { WS_URL } from '../config/constants.js';
 
 /**
  * @returns {{

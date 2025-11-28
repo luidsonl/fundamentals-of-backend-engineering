@@ -4,9 +4,9 @@ import express from 'express';
 import path from 'path';
 import { createServer } from 'http'; 
 import { WebSocketServer } from 'ws'; 
+import { PORT } from './config/constants.js';
 
 const app = express();
-const PORT = 3000;
 
 const server = createServer(app);
 
