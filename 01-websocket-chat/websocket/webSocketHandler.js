@@ -32,8 +32,9 @@ export default class WebSocketHandler{
             if(!roomId){
                 roomId = 'main';
             }
-
-            console.log(`${user.name} Connected to room ${roomId}`);
+            if(process.env.NODE_ENV === 'development'){
+                console.log(`New connection: ${user.name} to room ${roomId}`);
+            }
             this.roomManager.joinRoom(roomId, user);
 
             broadCastTooRoom(this.roomManager.getRoomById(roomId), 'System', `${user.name} joined the room.`);
