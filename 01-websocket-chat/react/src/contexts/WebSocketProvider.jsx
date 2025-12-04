@@ -19,9 +19,15 @@ export const WebSocketProvider = ({ children }) => {
     }, []);
 
     const connectToRoom = (roomId, name) => {
-        const roomParam = roomId ? `?room=${roomId}` : "";
-        const nameParam = name ? `&name=${name}` : "";
-        const socket = new WebSocket( WS_URL + roomParam + nameParam );
+        const params = [];
+
+        if (roomId) params.push(`room=${roomId}`);
+        if (name) params.push(`name=${name}`);
+
+        const query = params.length > 0 ? `?${params.join("&")}` : "";
+
+        const socket = new WebSocket(WS_URL + query);
+        
         wsRef.current = socket;
 
         socket.onopen = () => setIsConnected(true);
