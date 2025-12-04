@@ -78,6 +78,7 @@ export function broadcastSystemToUser( user, message ){
  */
 export function broadcastUserConnected( user ){
     const data = {
+        sender: 'System',
         type: 'setting',
         userName: user.name,
         timestamp: new Date().toISOString()

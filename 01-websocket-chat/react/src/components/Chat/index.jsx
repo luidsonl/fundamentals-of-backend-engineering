@@ -1,10 +1,10 @@
 // src/components/Chat.jsx
 
 import  { useState } from 'react';
-import { useWebSocket } from '../hooks/useWebSocket'; // Importa nosso Hook
+import { useWebSocket } from '../../hooks/useWebSocket';
 
 export default function Chat() {
-  const { isConnected, messages, sendMessage } = useWebSocket();
+  const { isConnected, messages, sendMessage, userName} = useWebSocket();
   const [input, setInput] = useState('');
 
   const handleSubmit = (e) => {
@@ -14,12 +14,6 @@ export default function Chat() {
       setInput('');
     }
   };
-  
-  const formatMessage = (msg) => {
-    
-    console.log(msg);
-    return { text: `nha`, isServer: false };
-  }
 
   return (
     <div style={{ maxWidth: 600, margin: '50px auto', padding: 20, border: '1px solid #ccc', borderRadius: 8 }}>
