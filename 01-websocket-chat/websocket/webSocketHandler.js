@@ -63,18 +63,10 @@ export default class WebSocketHandler {
      * @param {User} user 
      */
     setHandleMessage(user, roomId) {
-        const messageHandler = (data) => {
+        user.client.on('message', (data) => {
             const message = data.toString();
             broadcastToRoom(message, this.roomManager.getRoomById(roomId), user.name);
-        };
-
-        user.client.on('message', messageHandler);
-
-        // Store handler reference for cleanup
-        if (!user._handlers) {
-            user._handlers = {};
-        }
-        user._handlers.message = messageHandler;
+        });
     }
 
 
@@ -84,17 +76,9 @@ export default class WebSocketHandler {
      * @param {User} user 
      */
     setHandleClose(user, roomId) {
-        const closeHandler = () => {
+        user.client.on('close', () => {
             this.cleanupUser(user, roomId);
-        };
-
-        user.client.on('close', closeHandler);
-
-        // Store handler reference for cleanup
-        if (!user._handlers) {
-            user._handlers = {};
-        }
-        user._handlers.close = closeHandler;
+        });
     }
 
     /**
@@ -103,20 +87,12 @@ export default class WebSocketHandler {
      * @param {User} user 
      */
     setHandleError(user, roomId) {
-        const errorHandler = (error) => {
+        user.client.on('error', (error) => {
             if (process.env.NODE_ENV === 'development') {
                 console.error(`WebSocket error for user ${user.name}:`, error);
             }
             this.cleanupUser(user, roomId);
-        };
-
-        user.client.on('error', errorHandler);
-
-        // Store handler reference for cleanup
-        if (!user._handlers) {
-            user._handlers = {};
-        }
-        user._handlers.error = errorHandler;
+        });
     }
 
     /**
@@ -134,18 +110,9 @@ export default class WebSocketHandler {
             broadCastSystemToRoom(`${user.name} left the room.`, room, [user]);
         }
 
-        // Remove event listeners
-        if (user._handlers) {
-            if (user._handlers.message) {
-                user.client.removeListener('message', user._handlers.message);
-            }
-            if (user._handlers.close) {
-                user.client.removeListener('close', user._handlers.close);
-            }
-            if (user._handlers.error) {
-                user.client.removeListener('error', user._handlers.error);
-            }
-            delete user._handlers;
+        // Remove all event listeners from the WebSocket client
+        if (user.client) {
+            user.client.removeAllListeners();
         }
 
         // Remove from UserManager
