@@ -4,25 +4,25 @@ import { WebSocketServer } from "ws";
 import { broadcastToRoom, broadCastSystemToRoom, broadcastUserConnected } from "./utils/broadcast.js";
 import User from "./entities/User.js";
 
-export default class WebSocketHandler{
+export default class WebSocketHandler {
 
     static instance = null;
 
     /**
      * @param {import('http').Server} server
      */
-    constructor(server){
-        this.wss = new WebSocketServer({server});
+    constructor(server) {
+        this.wss = new WebSocketServer({ server });
         this.userManager = new UserManager();
         this.roomManager = new RoomManager();
         this.setup();
     }
-    
-    setup(){
+
+    setup() {
         this.handleConnection();
     }
 
-    handleConnection(){
+    handleConnection() {
         this.wss.on('connection', (ws, request) => {
             const url = new URL(request.url, `http://${request.headers.host}`);
             let roomId = url.searchParams.get('room');
@@ -30,10 +30,10 @@ export default class WebSocketHandler{
 
             const user = this.userManager.createUser(userName, ws);
 
-            if(!roomId){
+            if (!roomId) {
                 roomId = 'main';
             }
-            if(process.env.NODE_ENV === 'development'){
+            if (process.env.NODE_ENV === 'development') {
                 console.log(`New connection: ${user.name} to room ${roomId}`);
             }
             this.roomManager.joinRoom(roomId, user);
@@ -41,9 +41,10 @@ export default class WebSocketHandler{
             this.initConnection(user, roomId);
             this.setHandleMessage(user, roomId);
             this.setHandleClose(user, roomId);
+            this.setHandleError(user, roomId);
 
         });
-        
+
     }
 
     /**
@@ -51,7 +52,7 @@ export default class WebSocketHandler{
      * @param {User} user 
      * @param {string} roomId 
      */
-    initConnection(user, roomId){
+    initConnection(user, roomId) {
         broadCastSystemToRoom(`${user.name} joined the room.`, this.roomManager.getRoomById(roomId));
         broadcastUserConnected(user, roomId);
     }
@@ -61,11 +62,19 @@ export default class WebSocketHandler{
      * @param {string} roomId 
      * @param {User} user 
      */
-    setHandleMessage(user, roomId){
-        user.client.on('message', (data) => {
+    setHandleMessage(user, roomId) {
+        const messageHandler = (data) => {
             const message = data.toString();
             broadcastToRoom(message, this.roomManager.getRoomById(roomId), user.name);
-        });
+        };
+
+        user.client.on('message', messageHandler);
+
+        // Store handler reference for cleanup
+        if (!user._handlers) {
+            user._handlers = {};
+        }
+        user._handlers.message = messageHandler;
     }
 
 
@@ -74,16 +83,76 @@ export default class WebSocketHandler{
      * @param {string} roomId 
      * @param {User} user 
      */
-    setHandleClose(user, roomId){
-        user.client.on('close', () => {
-            this.roomManager.leaveRoom(roomId, user);
-            broadCastSystemToRoom(`${user.name} left the room.`, this.roomManager.getRoomById(roomId), [user]);
-            
-            if(process.env.NODE_ENV === 'development'){
-                console.log(`Disconnected: ${user.name} from room ${roomId}`);
-            }
-        });
+    setHandleClose(user, roomId) {
+        const closeHandler = () => {
+            this.cleanupUser(user, roomId);
+        };
+
+        user.client.on('close', closeHandler);
+
+        // Store handler reference for cleanup
+        if (!user._handlers) {
+            user._handlers = {};
+        }
+        user._handlers.close = closeHandler;
     }
 
-    
+    /**
+     * 
+     * @param {string} roomId 
+     * @param {User} user 
+     */
+    setHandleError(user, roomId) {
+        const errorHandler = (error) => {
+            if (process.env.NODE_ENV === 'development') {
+                console.error(`WebSocket error for user ${user.name}:`, error);
+            }
+            this.cleanupUser(user, roomId);
+        };
+
+        user.client.on('error', errorHandler);
+
+        // Store handler reference for cleanup
+        if (!user._handlers) {
+            user._handlers = {};
+        }
+        user._handlers.error = errorHandler;
+    }
+
+    /**
+     * Cleanup user resources to prevent memory leaks
+     * @param {User} user 
+     * @param {string} roomId 
+     */
+    cleanupUser(user, roomId) {
+        // Remove from room
+        this.roomManager.leaveRoom(roomId, user);
+
+        // Broadcast user left
+        const room = this.roomManager.getRoomById(roomId);
+        if (room) {
+            broadCastSystemToRoom(`${user.name} left the room.`, room, [user]);
+        }
+
+        // Remove event listeners
+        if (user._handlers) {
+            if (user._handlers.message) {
+                user.client.removeListener('message', user._handlers.message);
+            }
+            if (user._handlers.close) {
+                user.client.removeListener('close', user._handlers.close);
+            }
+            if (user._handlers.error) {
+                user.client.removeListener('error', user._handlers.error);
+            }
+            delete user._handlers;
+        }
+
+        // Remove from UserManager
+        this.userManager.removeUser(user.id);
+
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`Cleaned up user: ${user.name} from room ${roomId}`);
+        }
+    }
 }
