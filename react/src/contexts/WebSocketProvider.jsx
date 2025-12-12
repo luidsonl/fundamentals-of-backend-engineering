@@ -6,6 +6,7 @@ const WebSocketContext = createContext(null);
 export const WebSocketProvider = ({ children }) => {
     const [isConnected, setIsConnected] = useState(false);
     const [messages, setMessages] = useState([]);
+    const [usersList, setUsersList] = useState([]);
     const [userName, setUserName] = useState("");
     const [room, setRoom] = useState("");
 
@@ -34,6 +35,7 @@ export const WebSocketProvider = ({ children }) => {
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            console.log(data)
             
             if(data.type === "setting"){
                 if ( data.userName) {
@@ -44,8 +46,16 @@ export const WebSocketProvider = ({ children }) => {
                 }
                 return;
             }
-        
-            setMessages(prev => [data, ...prev]);
+            
+            if(data.type ==='message'){
+                setMessages(prev => [data, ...prev]);
+                return;
+            }
+            
+            if(data.type === 'users_list'){
+                setUsersList(data.users);
+                return;
+            }
         };
 
         socket.onclose = () => setIsConnected(false);
@@ -60,6 +70,11 @@ export const WebSocketProvider = ({ children }) => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
             wsRef.current.close();
         }
+
+        setIsConnected(false);
+        setMessages([]);
+        setUserName("");
+        setRoom("");
     };
 
     const sendMessage = (msg) => {
@@ -75,6 +90,7 @@ export const WebSocketProvider = ({ children }) => {
     <WebSocketContext.Provider value={{
       isConnected,
       messages,
+      usersList,
       userName,
       room,
       connectToRoom,

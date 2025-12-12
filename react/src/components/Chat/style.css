@@ -1,0 +1,24 @@
+.chat-container{
+    border: 1px solid var(--color-dark);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.chat-container .message-item .sender-name {
+    color: var(--color-primary);
+}
+
+.chat-container .message-item.own-message .sender-name {
+    color: var(--color-success);
+}
+
+.chat-container .message-item.system-message .sender-name {
+    color: var(--color-warning);
+}
+
+
+.chat-container .message-item {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 1rem;
+}

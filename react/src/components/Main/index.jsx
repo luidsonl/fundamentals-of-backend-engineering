@@ -3,6 +3,7 @@ import Register from "../Register";
 import Chat from "../Chat";
 import './style.css'
 import UserInfo from "../UserInfo";
+import UsersList from "../UsersList";
 
 export default function Main() {
     const { isConnected } = useWebSocket();
@@ -13,7 +14,11 @@ export default function Main() {
     return (
         <section>
             <UserInfo/>
-            <Chat />
+            <section>
+                <Chat />
+                <UsersList />
+            </section>
+            
         </section>
     );
 }

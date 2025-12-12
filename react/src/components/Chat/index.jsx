@@ -1,7 +1,6 @@
-// src/components/Chat.jsx
-
 import  { useState } from 'react';
 import { useWebSocket } from '../../hooks/useWebSocket';
+import './style.css';
 
 export default function Chat() {
   const { isConnected, messages, sendMessage, userName} = useWebSocket();
@@ -16,21 +15,27 @@ export default function Chat() {
   };
 
   return (
-    <div>
-      <div>
+    <div className='chat-container'>
+      <div className='messages-container'>
         {messages.map((message, index) => {
           return (
             <div 
-              key={index} 
+              key={index}
+              className={`message-item ${message.sender === userName ? 'own-message' : ''} ${message.sender === 'System' ? 'system-message' : ''}`}
             >
-              {message.message}
+              <span className='sender-name'>
+                {message.sender}
+              </span>
+              <span className='sender-message'>
+                {message.message}
+              </span>
             </div>
           );
         })}
         {messages.length === 0 && <p>Conectando...</p>}
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='input-container'>
         <input
           type="text"
           value={input}
