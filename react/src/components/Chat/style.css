@@ -2,6 +2,10 @@
     border: 1px solid var(--color-dark);
     padding: 1rem;
     border-radius: 8px;
+    flex: 4;
+    padding: 10px;
+    max-height: 75dvh;
+    overflow-y: scroll;
 }
 
 .chat-container .message-item .sender-name {
@@ -15,10 +19,41 @@
 .chat-container .message-item.system-message .sender-name {
     color: var(--color-warning);
 }
-
+.chat-container .message-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 5px;
+    padding-right: 0.5rem;
+    border: 1px solid var(--color-dark);
+}
+.chat-container .message-meta .timestamp {
+    font-size: 0.85rem;
+}
 
 .chat-container .message-item {
     margin-bottom: 10px;
     display: flex;
-    gap: 1rem;
+    align-items: last baseline;
+    gap: 0.5rem;
+}
+
+.chat-container form{
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+.chat-container input{
+    flex: 1;
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .chat-container .message-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+    }
+    
 }

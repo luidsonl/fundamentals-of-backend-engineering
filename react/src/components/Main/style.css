@@ -8,6 +8,7 @@
     --color-light:     #f8f9fa;
     --color-dark:      #212529;
     --main-margin-size: 10px;
+    --page-max-width: 1200px;
 }
 
 .primary{
@@ -28,4 +29,21 @@ body{
 }
 .main-container{
     margin: var(--main-margin-size);
+}
+
+.page-width{
+    max-width: var(--page-max-width);
+    margin: 0 auto;
+}
+
+.chat-users-container{
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .chat-users-container{
+        flex-direction: column;
+    }
 }

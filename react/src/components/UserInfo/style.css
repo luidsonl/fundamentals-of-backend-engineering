@@ -4,6 +4,10 @@
 .user-info .row{
     display: flex
 }
+.user-info .row-top{
+    border-bottom: 1px solid var(--color-dark);
+    padding-bottom: 10px;
+}
 .user-info .col{
     flex: 1;
 }

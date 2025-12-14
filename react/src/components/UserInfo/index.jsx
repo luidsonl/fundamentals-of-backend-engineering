@@ -10,7 +10,7 @@ export default function UserInfo() {
 
     return (
         <header className="user-info">
-            <div className="row">
+            <div className="row row-top">
                 <div className="col">
                     <div className={`status ${isConnected ? 'status-connected' : 'status-disconnected'}`}>
                         Status: {isConnected ? (
@@ -32,7 +32,7 @@ export default function UserInfo() {
                 </div>
             </div>
             
-            <div className="row">
+            <div className="row row-bottom">
                 <div className="room">
                     <h1>Sala: {room}</h1>
                 </div>

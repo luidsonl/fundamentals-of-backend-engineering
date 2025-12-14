@@ -10,11 +10,11 @@ export default function Main() {
 
 
     return(
-        <section className="main-container">
+        <section className="main-container page-width">
             {!isConnected && <Register />}
             {isConnected &&(
                 <><UserInfo/>
-                <section>
+                <section className="chat-users-container">
                     <Chat />
                     <UsersList />
                 </section>

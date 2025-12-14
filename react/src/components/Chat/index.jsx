@@ -23,12 +23,18 @@ export default function Chat() {
               key={index}
               className={`message-item ${message.sender === userName ? 'own-message' : ''} ${message.sender === 'System' ? 'system-message' : ''}`}
             >
-              <span className='sender-name'>
-                {message.sender}
-              </span>
-              <span className='sender-message'>
+              <div className='message-meta'>
+                <span className='timestamp'>
+                  {new Date(message.timestamp).toLocaleTimeString()}
+                </span>
+                <span className='sender-name'>
+                  {message.sender}
+                </span>
+              </div>
+              
+              <div className='message'>
                 {message.message}
-              </span>
+              </div>
             </div>
           );
         })}

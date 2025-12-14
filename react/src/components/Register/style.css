@@ -14,6 +14,7 @@
     width: 300px;
 }
 .register-form-container fieldset {
+    padding: 0;
     border: none;
     margin-bottom: 15px;
     display: flex;
@@ -25,6 +26,8 @@
 .register-form-container input {
     padding: 8px;
     font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
 }
 .register-form-container button {
     padding: 10px;
